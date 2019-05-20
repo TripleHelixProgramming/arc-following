@@ -9,21 +9,14 @@ package frc.robot;
 
 import com.team2363.logger.HelixEvents;
 import com.team2363.logger.HelixLogger;
-import com.team319.follower.FollowArc;
 
+import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
-import frc.arcs.DistanceScalingArc;
-import frc.arcs.ExampleArc;
-import frc.arcs.Figure8Arc;
-import frc.arcs.ForwardLeftArc;
-import frc.arcs.MultiSpeedTestArc;
-import frc.arcs.SpeedTestingArc;
-import frc.arcs.Straight10FeetArc;
-import frc.arcs.StraightBack10FeetArc;
-import frc.arcs.TurnScalingArc;
-import frc.robot.subsystems.Drivetrain;
+import frc.robot.oi.OI;
+
+import static frc.robot.drivetrain.Drivetrain.getDrivetrain;;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -33,6 +26,10 @@ import frc.robot.subsystems.Drivetrain;
  * project.
  */
 public class Robot extends TimedRobot {
+  //public static ExampleSubsystem m_subsystem = new ExampleSubsystem();
+  public static OI m_oi;
+	
+  private final Compressor compressor = new Compressor();
 
   Command autonomousCommand;
 
@@ -43,11 +40,12 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() { 
     initializeSubsystems();
+    getDrivetrain().resetHeading();
   }
 
   private void initializeSubsystems() {
-    OI.getInstance();
-    Drivetrain.getInstance();
+    OI.getOI();
+    getDrivetrain();
   }
 
   /**
@@ -88,12 +86,8 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-    Drivetrain.getInstance().resetHeading();
-    // autonomousCommand = new FollowArc(Drivetrain.getInstance(), new Straight10FeetArc());
-    // autonomousCommand = new FollowArc(Drivetrain.getInstance(), new ForwardLeftArc());
-    // autonomousCommand = new FollowArc(Drivetrain.getInstance(), new DistanceScalingArc());
-      autonomousCommand = new FollowArc(Drivetrain.getInstance(), new Figure8Arc());
-
+    getDrivetrain().resetHeading();
+    autonomousCommand = null;
     // schedule the autonomous command (example)
     if (autonomousCommand != null) {
       autonomousCommand.start();
