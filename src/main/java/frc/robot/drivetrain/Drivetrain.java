@@ -86,8 +86,8 @@ public class Drivetrain extends Subsystem {
   }
 
   public void tankDrive(double leftPercent, double rightPercent) {
-    left.set(Velocity, leftPercent * MAX_VELOCITY_IN_FPS);
-    right.set(Velocity, rightPercent * MAX_VELOCITY_IN_FPS);
+    left.set(Velocity, convertFromFeetToTicks(leftPercent * MAX_VELOCITY_IN_FPS));
+    right.set(Velocity, convertFromFeetToTicks(rightPercent * MAX_VELOCITY_IN_FPS));
   }
 
   private void setPIDFValues() {
@@ -167,9 +167,15 @@ public class Drivetrain extends Subsystem {
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Pigeon Yaw", getYaw());
+    SmartDashboard.putNumber("Left Velocity", getLeftVelocity());
+    SmartDashboard.putNumber("Right Velocity", getRightVelocity());
   }
 
   private double convertFromTicksToFeet(int ticks) {
     return PI * WHEEL_DIAMETER_IN_INCHES * ticks / ENCODER_TICKS_PER_REVOLUTION;
+  }
+
+  private double convertFromFeetToTicks(double feet) {
+    return ENCODER_TICKS_PER_REVOLUTION * feet / (PI * WHEEL_DIAMETER_IN_INCHES);
   }
 }
