@@ -8,6 +8,7 @@
 package frc.robot.drivetrain;
 
 import static com.ctre.phoenix.motorcontrol.ControlMode.Velocity;
+import static com.ctre.phoenix.motorcontrol.ControlMode.PercentOutput;
 import static com.ctre.phoenix.motorcontrol.NeutralMode.Brake;
 import static java.lang.Math.PI;
 
@@ -86,8 +87,8 @@ public class Drivetrain extends Subsystem {
   }
 
   public void tankDrive(double leftPercent, double rightPercent) {
-    left.set(Velocity, convertFromFeetToTicks(leftPercent * MAX_VELOCITY_IN_FPS));
-    right.set(Velocity, convertFromFeetToTicks(rightPercent * MAX_VELOCITY_IN_FPS));
+    left.set(PercentOutput, convertFromFeetToTicks(leftPercent * MAX_VELOCITY_IN_FPS));
+    right.set(PercentOutput, convertFromFeetToTicks(rightPercent * MAX_VELOCITY_IN_FPS));
   }
 
   private void setPIDFValues() {
