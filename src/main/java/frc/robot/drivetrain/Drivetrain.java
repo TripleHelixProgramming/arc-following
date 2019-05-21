@@ -7,8 +7,9 @@
 
 package frc.robot.drivetrain;
 
-import static com.ctre.phoenix.motorcontrol.ControlMode.PercentOutput;
+import static com.ctre.phoenix.motorcontrol.ControlMode.Velocity;
 import static com.ctre.phoenix.motorcontrol.NeutralMode.Brake;
+import static java.lang.Math.PI;
 
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
@@ -38,9 +39,9 @@ public class Drivetrain extends Subsystem {
     return INSTANCE;
   }
 
-  public static final double WHEEL_DIAMETER = 5;
-  public static final int ENCODER_TICKS_PER_REVOLUTION = 5;
-  public static final double MAX_VELOCITY = 5;
+  private static final double WHEEL_DIAMETER_IN_INCHES = 5;
+  private static final int ENCODER_TICKS_PER_REVOLUTION = 120;
+  public static final double MAX_VELOCITY_IN_FPS = 10;
 
   private static final int VELOCITY_CONTROL_SLOT = 0;
 
@@ -84,9 +85,9 @@ public class Drivetrain extends Subsystem {
     // setDefaultCommand(new NormalizedArcadeDrive());
   }
 
-  public void tankDrive(double leftVelocity, double rightVelocity) {
-    left.set(PercentOutput, leftVelocity);
-    right.set(PercentOutput, rightVelocity);
+  public void tankDrive(double leftPercent, double rightPercent) {
+    left.set(Velocity, leftPercent * MAX_VELOCITY_IN_FPS);
+    right.set(Velocity, rightPercent * MAX_VELOCITY_IN_FPS);
   }
 
   private void setPIDFValues() {
@@ -139,9 +140,9 @@ public class Drivetrain extends Subsystem {
     return ypr[0];
   }
 
-  public int getLeftVelocity() {
+  public double getLeftVelocity() {
     try {
-      return left.getSelectedSensorVelocity();
+      return convertFromTicksToFeet(left.getSelectedSensorVelocity());
     } catch(Exception e) {
       SmartDashboard.putString("Exception", e.getMessage());
       return 100000000;
@@ -151,20 +152,24 @@ public class Drivetrain extends Subsystem {
     }
   }
 
-  public int getRightVelocity() {
-    return right.getSelectedSensorVelocity();
+  public double getRightVelocity() {
+    return convertFromTicksToFeet(right.getSelectedSensorVelocity());
   }
 
-  public int getLeftPosition() {
-    return left.getSelectedSensorPosition();
+  public double getLeftPosition() {
+    return convertFromTicksToFeet(left.getSelectedSensorPosition());
   }
 
-  public int getRightPosition() {
-    return right.getSelectedSensorPosition();
+  public double getRightPosition() {
+    return  convertFromTicksToFeet(right.getSelectedSensorPosition());
   }
 
   @Override
   public void periodic() {
     SmartDashboard.putNumber("Pigeon Yaw", getYaw());
+  }
+
+  private double convertFromTicksToFeet(int ticks) {
+    return PI * WHEEL_DIAMETER_IN_INCHES * ticks / ENCODER_TICKS_PER_REVOLUTION;
   }
 }
