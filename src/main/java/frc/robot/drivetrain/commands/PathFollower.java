@@ -25,14 +25,13 @@ public class PathFollower extends Command {
   private DistanceFollower leftFollower;
   private DistanceFollower rightFollower;
 
-  private Trajectory leftTrajectory;
-  private Trajectory rightTrajectory;
-
   private Notifier notifier = new Notifier(this::followPath);
 
   // The starting positions of the left and right sides of the drivetrain
   private double leftStartingDistance;
   private double rightStartingDistance;
+
+  private double period;
 
   public PathFollower(String pathName) {
     requires(getDrivetrain());
@@ -48,11 +47,12 @@ public class PathFollower extends Command {
     leftStartingDistance = getDrivetrain().getLeftPosition();
     rightStartingDistance = getDrivetrain().getRightPosition();
 
-    // Set the two paths in the followers
-    leftFollower = new DistanceFollower(leftTrajectory);
-    rightFollower = new DistanceFollower(rightTrajectory);
+    //Make sure we're starting at the beginning of the path
+    leftFollower.reset();
+    rightFollower.reset();
 
-    notifier.startPeriodic(leftTrajectory.get(0).dt);
+    // Start running the path
+    notifier.startPeriodic(period);
   }
 
   @Override
@@ -73,8 +73,15 @@ public class PathFollower extends Command {
   private void importPath(String pathName) {
     try {
       // Read the path files from the file system
-      leftTrajectory = PathfinderFRC.getTrajectory(pathName + ".left");
-      rightTrajectory = PathfinderFRC.getTrajectory(pathName + ".right");
+      Trajectory leftTrajectory = PathfinderFRC.getTrajectory(pathName + ".left");
+      Trajectory rightTrajectory = PathfinderFRC.getTrajectory(pathName + ".right");
+
+      // Set the two paths in the followers
+      leftFollower = new DistanceFollower(leftTrajectory);
+      rightFollower = new DistanceFollower(rightTrajectory);
+
+      period = leftTrajectory.get(0).dt;
+
     } catch (IOException e) {
 		  e.printStackTrace();
 	  }
